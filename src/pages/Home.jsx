@@ -5,9 +5,11 @@ import { useState } from 'react';
 import LanguageSelector from '../components/LanguageSelector';
 import SunIcon from '../components/SunIcon';
 import heroImage from '../assets/icons/mind-hero.jpg';
+import { useAuth } from '../contexts/FirebaseAuthContext';
 
 const Home = () => {
   const { t } = useTranslation();
+  const { isAuthenticated, user, userProfile, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -29,10 +31,10 @@ const Home = () => {
               <div className="hidden md:flex items-center space-x-8">
                 <Link 
                   to="/" 
-                  className="nav-link text-white/90 hover:text-white font-medium transition-all duration-300 hover:scale-105 hover:drop-shadow-sm relative group"
+                  className="nav-link text-white font-medium transition-all duration-300 hover:scale-105 hover:drop-shadow-sm relative group"
                 >
                   {t('nav.home')}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-400 transition-all duration-300 group-hover:w-full"></span>
+                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-accent-400 transition-all duration-300"></span>
                 </Link>
                 <Link 
                   to="/about" 
@@ -44,17 +46,37 @@ const Home = () => {
                 <div className="nav-item-wrapper">
                   <LanguageSelector />
                 </div>
-                <Link 
-                  to="/auth" 
-                  className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-2.5 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium"
-                >
-                  {t('nav.signIn')}
-                </Link>
+                {isAuthenticated ? (
+                  <div className="flex items-center space-x-4">
+                    <div className="text-white/90 text-sm">
+                      Hello, {userProfile?.name || user?.displayName || 'User'}
+                    </div>
+                    <Link 
+                      to="/profile" 
+                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium text-sm"
+                    >
+                      Profile
+                    </Link>
+                    <button 
+                      onClick={signOut}
+                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium text-sm"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                ) : (
+                  <Link 
+                    to="/auth" 
+                    className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-2.5 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium"
+                  >
+                    {t('nav.signIn')}
+                  </Link>
+                )}
               </div>
 
               {/* Mobile Menu Button */}
               <button
-                className="md:hidden p-3 rounded-full hover:bg-white/10 transition-all duration-300 hover:scale-110 backdrop-blur-sm"
+                className="md:hidden p-3 rounded-full hover:bg-white/10 transition-all duration-300 hover:scale-110 active:scale-95 backdrop-blur-sm min-h-[48px] min-w-[48px] flex items-center justify-center touch-manipulation"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? (
@@ -68,17 +90,17 @@ const Home = () => {
             {/* Mobile Navigation */}
             {isMenuOpen && (
               <div className="md:hidden mt-6 pt-6 border-t border-white/20">
-                <div className="flex flex-col space-y-4">
+                <div className="flex flex-col space-y-3">
                   <Link 
                     to="/" 
-                    className="text-white/90 hover:text-white font-medium transition-all duration-300 py-3 px-4 rounded-xl hover:bg-white/10 hover:scale-105"
+                    className="mobile-btn text-white font-medium transition-all duration-300 py-4 px-4 rounded-xl bg-white/10 scale-105 touch-manipulation min-h-[48px] flex items-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {t('nav.home')}
                   </Link>
                   <Link 
                     to="/about" 
-                    className="text-white/90 hover:text-white font-medium transition-all duration-300 py-3 px-4 rounded-xl hover:bg-white/10 hover:scale-105"
+                    className="mobile-btn text-white/90 hover:text-white font-medium transition-all duration-300 py-4 px-4 rounded-xl hover:bg-white/10 hover:scale-105 active:scale-95 touch-manipulation min-h-[48px] flex items-center"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {t('nav.about')}
@@ -86,13 +108,37 @@ const Home = () => {
                   <div className="py-2 px-4">
                     <LanguageSelector />
                   </div>
-                  <Link 
-                    to="/auth" 
-                    className="bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-3 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium text-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('nav.signIn')}
-                  </Link>
+                  {isAuthenticated ? (
+                    <>
+                      <div className="px-4 py-2 text-white/90 text-sm">
+                        Hello, {userProfile?.name || user?.displayName || 'User'}
+                      </div>
+                      <Link 
+                        to="/profile" 
+                        className="mobile-btn bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-4 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 active:scale-95 hover:shadow-lg transition-all duration-300 font-medium text-center min-h-[48px] flex items-center justify-center touch-manipulation"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <button 
+                        onClick={() => {
+                          signOut();
+                          setIsMenuOpen(false);
+                        }}
+                        className="mobile-btn bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-4 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 active:scale-95 hover:shadow-lg transition-all duration-300 font-medium text-center min-h-[48px] flex items-center justify-center touch-manipulation"
+                      >
+                        Sign Out
+                      </button>
+                    </>
+                  ) : (
+                    <Link 
+                      to="/auth" 
+                      className="mobile-btn bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-4 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 active:scale-95 hover:shadow-lg transition-all duration-300 font-medium text-center min-h-[48px] flex items-center justify-center touch-manipulation"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      {t('nav.signIn')}
+                    </Link>
+                  )}
                 </div>
               </div>
             )}
@@ -100,7 +146,7 @@ const Home = () => {
         </div>
       </header>
 
-      {/* Hero Section - Fullscreen Background */}
+      {/* Hero Section - Mobile Optimized */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
@@ -108,41 +154,45 @@ const Home = () => {
             src={heroImage} 
             alt="AI Healthcare Background" 
             className="w-full h-full object-cover"
+            loading="eager"
           />
-          {/* Darker overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/40"></div>
+          {/* Mobile-optimized overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/50 md:from-black/60 md:via-black/50 md:to-black/40"></div>
           {/* Additional overlay for depth */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/30 md:from-black/30 md:to-black/20"></div>
         </div>
 
         {/* Centered Hero Content */}
-        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+        <div className="relative z-10 text-center px-3 md:px-4 max-w-5xl mx-auto">
           {/* Hero Content */}
-          <div className="space-y-6 md:space-y-8">
+          <div className="space-y-4 md:space-y-6 lg:space-y-8 mobile-spacing">
             {/* Headline */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-tight animate-fade-in">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-tight animate-fade-in mobile-text-2xl md:text-5xl">
               Understand your{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-accent-600">
                 symptoms
               </span>
-              <br />
+              <br className="hidden sm:block" />
+              <span className="sm:hidden"> </span>
               with trusted AI guidance
             </h1>
             
             {/* Subtext */}
-            <p className="text-base md:text-lg lg:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto font-medium animate-slide-up delay-200">
+            <p className="text-sm md:text-lg lg:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto font-medium animate-slide-up delay-200 mobile-text-sm md:text-lg px-2 md:px-0">
               Your multilingual health companion in{' '}
               <span className="text-accent-300 font-semibold">English</span>,{' '}
               <span className="text-accent-300 font-semibold">Korean</span>, and{' '}
-              <span className="text-accent-300 font-semibold">Uzbek</span> —<br />
-              designed for foreigners in South Korea.
+              <span className="text-accent-300 font-semibold">Uzbek</span>
+              <br className="hidden md:block" />
+              <span className="md:hidden"> — </span>
+              <span className="hidden md:inline">— </span>designed for foreigners in South Korea.
             </p>
             
             {/* CTA Button */}
-            <div className="animate-fade-in delay-300">
+            <div className="animate-fade-in delay-300 pt-2">
               <Link 
                 to="/chat" 
-                className="group inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 hover:from-yellow-300 hover:to-amber-400 animate-pulse-glow"
+                className="mobile-btn group inline-flex items-center justify-center px-6 py-4 md:px-8 md:py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-bold text-base md:text-lg rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 active:scale-95 transition-all duration-300 hover:from-yellow-300 hover:to-amber-400 min-h-[52px] touch-manipulation"
               >
                 <span>Start Symptom Analysis</span>
                 <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,24 +202,24 @@ const Home = () => {
             </div>
             
             {/* Trust Indicators */}
-            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-white/90 animate-fade-in delay-400">
-              <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-2">
-                <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+            <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 lg:gap-6 text-white/90 animate-fade-in delay-400 px-2">
+              <div className="flex items-center space-x-1.5 md:space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-2.5 py-1.5 md:px-3 md:py-2">
+                <svg className="w-3 h-3 md:w-4 md:h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                <span className="text-sm font-medium">Free to use</span>
+                <span className="text-xs md:text-sm font-medium whitespace-nowrap">Free to use</span>
               </div>
-              <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-2">
-                <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+              <div className="flex items-center space-x-1.5 md:space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-2.5 py-1.5 md:px-3 md:py-2">
+                <svg className="w-3 h-3 md:w-4 md:h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
-                <span className="text-sm font-medium">No registration required</span>
+                <span className="text-xs md:text-sm font-medium whitespace-nowrap">No registration required</span>
               </div>
-              <div className="flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-3 py-2">
-                <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+              <div className="flex items-center space-x-1.5 md:space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-2.5 py-1.5 md:px-3 md:py-2">
+                <svg className="w-3 h-3 md:w-4 md:h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span className="text-sm font-medium">Privacy protected</span>
+                <span className="text-xs md:text-sm font-medium whitespace-nowrap">Privacy protected</span>
               </div>
             </div>
           </div>
@@ -184,20 +234,20 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-20">
-        <div className="container mx-auto px-4">
+      <section className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-12 md:py-20">
+        <div className="container mx-auto px-3 md:px-4">
           {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-4">
+          <div className="text-center mb-10 md:mb-16">
+            <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-secondary-900 mb-3 md:mb-4 mobile-text-2xl">
               Why Choose Avicenna?
             </h2>
-            <p className="text-lg text-secondary-600 max-w-2xl mx-auto">
+            <p className="text-base md:text-lg text-secondary-600 max-w-2xl mx-auto mobile-text-base px-2 md:px-0">
               Advanced AI technology meets multilingual healthcare support for better health decisions
             </p>
           </div>
 
           {/* Features Grid */}
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
             <div className="card text-center animate-slide-up hover:shadow-soft-lg transition-all duration-300 group">
               <div className="card-body">
                 <div className="w-16 h-16 bg-accent-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-accent-200 transition-colors">

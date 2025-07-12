@@ -17,15 +17,41 @@
     scroll-behavior: smooth;
   }
 
-  /* Mobile touch improvements */
+    /* Mobile touch improvements */
   @media (max-width: 768px) {
     * {
       -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+    
+    input, textarea, select, button {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
     }
     
     body {
       font-size: 14px;
       line-height: 1.5;
+      overflow-x: hidden;
+    }
+    
+    /* Improve touch targets */
+    button, a, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+      touch-action: manipulation;
+    }
+    
+    /* Better mobile scrolling */
+    .mobile-scroll {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
     }
   }
 }
@@ -93,6 +119,15 @@
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
   }
 
+  /* Enhanced glass card for dark backgrounds */
+  .enhanced-glass-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
   /* Mobile optimized glass card */
   @media (max-width: 768px) {
     .glass-card {
@@ -101,6 +136,14 @@
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.4);
       box-shadow: 0 4px 20px 0 rgba(31, 38, 135, 0.15);
+    }
+
+    .enhanced-glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.2);
     }
   }
 
@@ -383,19 +426,150 @@
   }
 }
 
-/* Chat message slide-in animation */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
+  /* Chat message slide-in animation */
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
 
-/* Mobile: optimized slide-in animation */
+  /* Mobile-optimized components */
+  @media (max-width: 768px) {
+    /* Enhanced glass morphism for mobile */
+    .enhanced-glass-card {
+      background: rgba(255, 255, 255, 0.12) !important;
+      backdrop-filter: blur(15px) !important;
+      -webkit-backdrop-filter: blur(15px) !important;
+      border-radius: 1rem !important;
+      margin: 0.5rem !important;
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.10) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-radius: 1rem !important;
+    }
+    
+    /* Mobile-friendly buttons */
+    .mobile-btn {
+      padding: 0.75rem 1.5rem !important;
+      font-size: 0.875rem !important;
+      border-radius: 9999px !important;
+      touch-action: manipulation;
+      min-height: 44px;
+    }
+    
+    /* Mobile navigation */
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Improved mobile forms */
+    .mobile-form-input {
+      font-size: 16px !important; /* Prevents zoom on iOS */
+      padding: 0.875rem 1rem !important;
+      border-radius: 0.75rem !important;
+      min-height: 44px;
+    }
+    
+    /* Mobile chat optimizations */
+    .chat-container {
+      margin: 0.5rem !important;
+      border-radius: 1rem !important;
+    }
+    
+    .chat-messages-wrapper {
+      max-height: 60vh !important;
+    }
+    
+    /* Better mobile modals */
+    .mobile-modal {
+      margin: 1rem !important;
+      border-radius: 1rem !important;
+      max-height: calc(100vh - 2rem) !important;
+      overflow-y: auto;
+    }
+    
+    /* Touch-friendly spacing */
+    .mobile-spacing > * + * {
+      margin-top: 0.75rem !important;
+    }
+    
+    /* Responsive text sizing */
+    .mobile-text-xs { font-size: 0.75rem !important; }
+    .mobile-text-sm { font-size: 0.875rem !important; }
+    .mobile-text-base { font-size: 1rem !important; }
+    .mobile-text-lg { font-size: 1.125rem !important; }
+    .mobile-text-xl { font-size: 1.25rem !important; }
+    .mobile-text-2xl { font-size: 1.5rem !important; }
+    .mobile-text-3xl { font-size: 1.875rem !important; }
+  }
+
+  /* Enhanced Chat Animations */
+  @keyframes slideInMessage {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px); }
+  }
+
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(79, 172, 254, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(79, 172, 254, 0.6); }
+  }
+
+  .animate-shake {
+    animation: shake 0.5s ease-in-out;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+  /* Enhanced Chat Container */
+  .chat-enhanced {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .chat-enhanced:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+  }
+
+  /* Mobile: optimized slide-in animation */
 @media (max-width: 768px) {
   @keyframes slideIn {
     from {
@@ -406,5 +580,25 @@
       opacity: 1;
       transform: translateX(0);
     }
+  }
+  
+  @keyframes slideInMessage {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  .chat-enhanced {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+  }
+  
+  .chat-enhanced:hover {
+    transform: none;
   }
 }

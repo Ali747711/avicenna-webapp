@@ -92,9 +92,12 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={getPlaceholder()}
-                className="w-full px-4 py-3 pb-6 md:px-6 md:py-4 md:pb-8 bg-white/50 backdrop-blur-sm border border-white/30 rounded-xl md:rounded-2xl text-secondary-900 placeholder-secondary-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent focus:bg-white/70 transition-all duration-300 resize-none min-h-[100px] md:min-h-[120px] text-sm md:text-base leading-relaxed glow-on-focus"
+                className="mobile-form-input w-full px-3 py-3 pb-8 md:px-6 md:py-4 md:pb-8 bg-white/50 backdrop-blur-sm border border-white/30 rounded-xl md:rounded-2xl text-secondary-900 placeholder-secondary-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent focus:bg-white/70 transition-all duration-300 resize-none min-h-[80px] md:min-h-[120px] text-base md:text-base leading-relaxed glow-on-focus mobile-scroll"
                 disabled={isLoading || disabled}
                 maxLength={1000}
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck="false"
               />
               
               {/* Character Count - positioned in bottom right of textarea */}
@@ -129,16 +132,16 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
                 <button
                   type="submit"
                   disabled={!message.trim() || isLoading || disabled}
-                  className={`group relative px-4 py-2.5 md:px-6 md:py-3 rounded-full font-medium transition-all duration-300 flex items-center space-x-1.5 md:space-x-2 shadow-lg text-sm md:text-base ${
+                  className={`mobile-btn group relative px-4 py-3 md:px-6 md:py-3 rounded-full font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg text-sm md:text-base min-h-[50px] ${
                     !message.trim() || isLoading || disabled
                       ? 'bg-white/30 text-secondary-400 cursor-not-allowed backdrop-blur-sm border border-white/20'
-                      : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 hover:scale-110 hover:shadow-xl backdrop-blur-sm border border-white/20 glow-on-hover'
+                      : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 hover:scale-105 hover:shadow-xl backdrop-blur-sm border border-white/20 active:scale-95'
                   }`}
                 >
                   {isLoading ? (
-                    <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white/50 border-t-white rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-white/50 border-t-white rounded-full animate-spin"></div>
                   ) : (
-                    <Send className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-0.5 transition-transform" />
+                    <Send className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
                   )}
                   <span className="hidden sm:inline">
                     {isLoading ? 'Analyzing...' : 'Send'}
