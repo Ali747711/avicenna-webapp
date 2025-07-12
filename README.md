@@ -14,7 +14,7 @@ A healthcare AI assistant designed for foreigners living in South Korea, providi
 
 - **Frontend**: React + Vite + Tailwind CSS
 - **Backend**: Vercel Functions
-- **AI**: OpenAI GPT-4
+- **AI**: Google Gemini 1.5 Flash
 - **Database**: Firebase Firestore
 - **Authentication**: Firebase Auth
 - **Deployment**: Vercel
@@ -37,8 +37,8 @@ npm install
 ### 2. Environment Variables
 Create `.env.local` file:
 ```env
-# OpenAI API Key
-OPENAI_API_KEY=your_openai_api_key_here
+# Google Gemini API Key
+GEMINI_API_KEY=your_gemini_api_key_here
 
 # Firebase Configuration (optional)
 VITE_FIREBASE_API_KEY=your_firebase_api_key
@@ -91,9 +91,9 @@ Analyze user symptoms and provide medical information.
 
 ## 🔧 Setup Services
 
-### OpenAI API
-1. Go to [OpenAI Platform](https://platform.openai.com/)
-2. Create API key
+### Google Gemini API
+1. Go to [Google AI Studio](https://aistudio.google.com/)
+2. Create API key (free, no credit card required)
 3. Add to environment variables
 
 ### Firebase (Optional)
@@ -119,7 +119,7 @@ vercel --prod
 
 ### Environment Variables (Vercel)
 Set these in your Vercel dashboard:
-- `OPENAI_API_KEY`
+- `GEMINI_API_KEY`
 - Firebase variables (if using auth/database)
 
 ## 📚 Project Structure

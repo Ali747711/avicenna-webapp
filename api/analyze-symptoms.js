@@ -22,7 +22,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Symptoms are required' });
     }
 
-    // Enhanced GPT prompt for healthcare analysis
+    // Enhanced Gemini prompt for healthcare analysis
     const prompt = `You are a medical information assistant. A user reported: "${symptoms}"
 
 Please respond with exactly this JSON format:
@@ -43,38 +43,39 @@ If symptoms are severe or life-threatening, always recommend emergency care.
 Important: Always include the medical disclaimer.
 Respond in ${language === 'ko' ? 'Korean' : language === 'uz' ? 'Uzbek' : 'English'}.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${process.env.GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
+        contents: [
           {
-            role: 'system',
-            content: 'You are a helpful medical information assistant. Always provide structured, accurate information with appropriate disclaimers.'
-          },
-          {
-            role: 'user',
-            content: prompt
+            parts: [
+              {
+                text: prompt
+              }
+            ]
           }
         ],
-        max_tokens: 1000,
-        temperature: 0.3,
+        generationConfig: {
+          temperature: 0.3,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1000,
+        }
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      throw new Error(`Gemini API error: ${response.status}`);
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0]?.message?.content;
+    const aiResponse = data.candidates[0]?.content?.parts[0]?.text;
 
     if (!aiResponse) {
-      throw new Error('No response from OpenAI');
+      throw new Error('No response from Gemini');
     }
 
     // Try to parse JSON response
