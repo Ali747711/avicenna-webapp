@@ -31,7 +31,7 @@
 }
 
 .cta-button {
-  @apply bg-primary-600 text-white hover:bg-primary-700 text-lg px-8 py-4 animate-fade-in rounded-xl shadow-soft transition-all duration-200;
+  @apply bg-blue-600 text-white hover:bg-blue-700 text-lg px-8 py-4 rounded-xl shadow-lg transition-all duration-200;
 }
 
 .cta-button:hover {

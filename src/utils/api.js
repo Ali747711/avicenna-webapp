@@ -1,7 +1,7 @@
 // API service for symptom analysis
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
   ? '/api' 
-  : 'http://localhost:3000/api';
+  : 'https://avicenna-webapp.vercel.app/api';
 
 export const analyzeSymptoms = async (symptoms, language = 'en') => {
   try {
@@ -17,7 +17,16 @@ export const analyzeSymptoms = async (symptoms, language = 'en') => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorData = await response.json().catch(() => null);
+      
+      // Handle service overload with fallback data
+      if (response.status === 503 && errorData?.fallback) {
+        console.warn('Service temporarily unavailable, using fallback response');
+        return errorData.fallback;
+      }
+      
+      const errorMessage = errorData?.message || `HTTP error! status: ${response.status}`;
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
