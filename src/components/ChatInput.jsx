@@ -60,98 +60,73 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
   };
 
   return (
-    <div className="px-3 md:px-4">
-      <div className="container mx-auto max-w-4xl">
-        <div className="glass-card rounded-2xl md:rounded-3xl p-4 md:p-6 shadow-soft-lg border border-white/20">
-          {/* Language Selection Pills - more compact on mobile */}
-          <div className="flex items-center justify-center mb-4 md:mb-6">
-            <div className="flex bg-white/30 backdrop-blur-sm rounded-full p-0.5 md:p-1 border border-white/20">
-              {languages.map((lang) => (
-                <button
-                  key={lang.code}
-                  onClick={() => setSelectedLanguage(lang.code)}
-                  className={`group relative px-3 py-1.5 md:px-4 md:py-2 rounded-full font-medium text-xs md:text-sm transition-all duration-300 flex items-center space-x-1.5 md:space-x-2 ${
-                    selectedLanguage === lang.code
-                      ? 'bg-primary-500 text-white shadow-lg scale-105'
-                      : 'text-secondary-700 hover:bg-white/50 hover:scale-105'
-                  }`}
-                >
-                  <span className="text-sm md:text-lg">{lang.flag}</span>
-                  <span className="hidden sm:inline">{lang.shortName}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Input Form */}
-          <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
-            {/* Main Input Container */}
-            <div className="relative">
+    <div className="relative">
+      <form onSubmit={handleSubmit}>
+        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4 focus-within:border-primary-500 transition-colors shadow-lg">
+          <div className="flex items-end space-x-4">
+            {/* Text Input */}
+            <div className="flex-1">
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={getPlaceholder()}
-                className="mobile-form-input w-full px-3 py-3 pb-8 md:px-6 md:py-4 md:pb-8 bg-white/50 backdrop-blur-sm border border-white/30 rounded-xl md:rounded-2xl text-secondary-900 placeholder-secondary-500 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent focus:bg-white/70 transition-all duration-300 resize-none min-h-[80px] md:min-h-[120px] text-base md:text-base leading-relaxed glow-on-focus mobile-scroll"
+                className="w-full bg-transparent text-white placeholder-slate-400 resize-none focus:outline-none text-base leading-relaxed min-h-[24px] max-h-[200px]"
                 disabled={isLoading || disabled}
                 maxLength={1000}
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck="false"
+                rows={1}
+                style={{
+                  height: 'auto',
+                  minHeight: '24px'
+                }}
+                onInput={(e) => {
+                  e.target.style.height = 'auto';
+                  e.target.style.height = Math.min(e.target.scrollHeight, 200) + 'px';
+                }}
               />
               
-              {/* Character Count - positioned in bottom right of textarea */}
-              <div className="absolute bottom-1.5 right-3 md:bottom-2 md:right-4 text-xs text-secondary-400 pointer-events-none">
-                {message.length}/1000
-              </div>
-            </div>
-
-            {/* Bottom Section - Example Prompts and Send Button */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4">
-              {/* Example Prompts */}
-              <div className="flex-1 min-w-0">
-                <div className="flex flex-wrap gap-1.5 md:gap-2 items-center">
-                  <span className="text-xs text-secondary-500 font-medium flex-shrink-0">Try:</span>
-                  {getExamplePrompts().map((prompt, index) => (
+              {/* Bottom Row: Language + Character Count */}
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-700">
+                <div className="flex items-center space-x-2">
+                  {languages.map((lang) => (
                     <button
-                      key={index}
+                      key={lang.code}
                       type="button"
-                      onClick={() => setMessage(prompt)}
-                      className="text-xs bg-white/50 hover:bg-white/70 text-secondary-600 px-2 py-1 md:px-3 md:py-1.5 rounded-full transition-all duration-300 hover:scale-105 backdrop-blur-sm border border-white/30 truncate max-w-[150px] md:max-w-[200px]"
-                      disabled={isLoading || disabled}
-                      title={prompt}
+                      onClick={() => setSelectedLanguage(lang.code)}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                        selectedLanguage === lang.code
+                          ? 'bg-primary-600 text-white'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                      }`}
                     >
-                      {prompt}
+                      <span className="mr-1">{lang.flag}</span>
+                      {lang.shortName}
                     </button>
                   ))}
                 </div>
-              </div>
-
-              {/* Send Button */}
-              <div className="flex-shrink-0 self-end sm:self-auto">
-                <button
-                  type="submit"
-                  disabled={!message.trim() || isLoading || disabled}
-                  className={`mobile-btn group relative px-4 py-3 md:px-6 md:py-3 rounded-full font-medium transition-all duration-300 flex items-center space-x-2 shadow-lg text-sm md:text-base min-h-[50px] ${
-                    !message.trim() || isLoading || disabled
-                      ? 'bg-white/30 text-secondary-400 cursor-not-allowed backdrop-blur-sm border border-white/20'
-                      : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:from-primary-600 hover:to-primary-700 hover:scale-105 hover:shadow-xl backdrop-blur-sm border border-white/20 active:scale-95'
-                  }`}
-                >
-                  {isLoading ? (
-                    <div className="w-5 h-5 border-2 border-white/50 border-t-white rounded-full animate-spin"></div>
-                  ) : (
-                    <Send className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
-                  )}
-                  <span className="hidden sm:inline">
-                    {isLoading ? 'Analyzing...' : 'Send'}
-                  </span>
-                </button>
+                <span className="text-xs text-slate-500">{message.length}/1000</span>
               </div>
             </div>
-          </form>
+
+            {/* Send Button */}
+            <button
+              type="submit"
+              disabled={!message.trim() || isLoading || disabled}
+              className={`p-3 rounded-xl transition-all duration-200 flex items-center justify-center min-w-[48px] self-end ${
+                !message.trim() || isLoading || disabled
+                  ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
+                  : 'bg-primary-600 text-white hover:bg-primary-700 active:scale-95 shadow-lg'
+              }`}
+            >
+              {isLoading ? (
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };
