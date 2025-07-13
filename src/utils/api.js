@@ -58,6 +58,7 @@ export const getUrgencyStyle = (urgency) => {
 
 // Helper function to get urgency level text
 export const getUrgencyText = (urgency, language = 'en') => {
+  // Import i18n to use the translation system
   const translations = {
     en: {
       monitor_at_home: 'Monitor at Home',

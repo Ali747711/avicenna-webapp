@@ -31,17 +31,15 @@ const Home = () => {
               <div className="hidden md:flex items-center space-x-8">
                 <Link 
                   to="/" 
-                  className="nav-link text-white font-medium transition-all duration-300 hover:scale-105 hover:drop-shadow-sm relative group"
+                  className="nav-link active text-white font-medium"
                 >
                   {t('nav.home')}
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-accent-400 transition-all duration-300"></span>
                 </Link>
                 <Link 
                   to="/about" 
-                  className="nav-link text-white/90 hover:text-white font-medium transition-all duration-300 hover:scale-105 hover:drop-shadow-sm relative group"
+                  className="nav-link text-white/90 hover:text-white font-medium"
                 >
                   {t('nav.about')}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-400 transition-all duration-300 group-hover:w-full"></span>
                 </Link>
                 <div className="nav-item-wrapper">
                   <LanguageSelector />
@@ -49,25 +47,25 @@ const Home = () => {
                 {isAuthenticated ? (
                   <div className="flex items-center space-x-4">
                     <div className="text-white/90 text-sm">
-                      Hello, {userProfile?.name || user?.displayName || 'User'}
+                      {t('common.hello')}, {userProfile?.name || user?.displayName || 'User'}
                     </div>
                     <Link 
                       to="/profile" 
-                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium text-sm"
+                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 font-medium text-sm"
                     >
-                      Profile
+                      {t('common.profile')}
                     </Link>
                     <button 
                       onClick={signOut}
-                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium text-sm"
+                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 font-medium text-sm"
                     >
-                      Sign Out
+                      {t('common.signOut')}
                     </button>
                   </div>
                 ) : (
                   <Link 
                     to="/auth" 
-                    className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-2.5 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium"
+                    className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-2.5 rounded-full hover:bg-white/20 hover:border-white/30 font-medium"
                   >
                     {t('nav.signIn')}
                   </Link>
@@ -111,14 +109,14 @@ const Home = () => {
                   {isAuthenticated ? (
                     <>
                       <div className="px-4 py-2 text-white/90 text-sm">
-                        Hello, {userProfile?.name || user?.displayName || 'User'}
+                        {t('common.hello')}, {userProfile?.name || user?.displayName || 'User'}
                       </div>
                       <Link 
                         to="/profile" 
                         className="mobile-btn bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-4 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 active:scale-95 hover:shadow-lg transition-all duration-300 font-medium text-center min-h-[48px] flex items-center justify-center touch-manipulation"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Profile
+                        {t('common.profile')}
                       </Link>
                       <button 
                         onClick={() => {
@@ -127,7 +125,7 @@ const Home = () => {
                         }}
                         className="mobile-btn bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-4 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 active:scale-95 hover:shadow-lg transition-all duration-300 font-medium text-center min-h-[48px] flex items-center justify-center touch-manipulation"
                       >
-                        Sign Out
+                        {t('common.signOut')}
                       </button>
                     </>
                   ) : (
@@ -168,24 +166,24 @@ const Home = () => {
           <div className="space-y-4 md:space-y-6 lg:space-y-8 mobile-spacing">
             {/* Headline */}
             <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-display font-bold text-white leading-tight animate-fade-in mobile-text-2xl md:text-5xl">
-              Understand your{' '}
+              {t('home.hero.understandYour')}{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-accent-600">
-                symptoms
+                {t('home.hero.symptoms')}
               </span>
               <br className="hidden sm:block" />
               <span className="sm:hidden"> </span>
-              with trusted AI guidance
+              {t('home.hero.withTrustedAI')}
             </h1>
             
             {/* Subtext */}
             <p className="text-sm md:text-lg lg:text-xl text-white/90 leading-relaxed max-w-3xl mx-auto font-medium animate-slide-up delay-200 mobile-text-sm md:text-lg px-2 md:px-0">
-              Your multilingual health companion in{' '}
-              <span className="text-accent-300 font-semibold">English</span>,{' '}
-              <span className="text-accent-300 font-semibold">Korean</span>, and{' '}
-              <span className="text-accent-300 font-semibold">Uzbek</span>
+              {t('home.hero.multilingualCompanion')}{' '}
+              <span className="text-accent-300 font-semibold">{t('home.hero.english')}</span>,{' '}
+              <span className="text-accent-300 font-semibold">{t('home.hero.korean')}</span>, and{' '}
+              <span className="text-accent-300 font-semibold">{t('home.hero.uzbek')}</span>
               <br className="hidden md:block" />
               <span className="md:hidden"> — </span>
-              <span className="hidden md:inline">— </span>designed for foreigners in South Korea.
+              <span className="hidden md:inline">— </span>{t('home.hero.designedFor')}
             </p>
             
             {/* CTA Button */}
@@ -194,7 +192,7 @@ const Home = () => {
                 to="/chat" 
                 className="mobile-btn group inline-flex items-center justify-center px-6 py-4 md:px-8 md:py-4 bg-gradient-to-r from-yellow-400 to-amber-500 text-white font-bold text-base md:text-lg rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 active:scale-95 transition-all duration-300 hover:from-yellow-300 hover:to-amber-400 min-h-[52px] touch-manipulation"
               >
-                <span>Start Symptom Analysis</span>
+                <span>{t('home.cta')}</span>
                 <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -239,10 +237,10 @@ const Home = () => {
           {/* Section Header */}
           <div className="text-center mb-10 md:mb-16">
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-display font-bold text-secondary-900 mb-3 md:mb-4 mobile-text-2xl">
-              Why Choose Avicenna?
+              {t('home.whyChoose.title')}
             </h2>
             <p className="text-base md:text-lg text-secondary-600 max-w-2xl mx-auto mobile-text-base px-2 md:px-0">
-              Advanced AI technology meets multilingual healthcare support for better health decisions
+              {t('home.whyChoose.subtitle')}
             </p>
           </div>
 
@@ -298,10 +296,10 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-secondary-900 mb-4">
-              How Avicenna Works
+              {t('home.howItWorks.title')}
             </h2>
             <p className="text-lg text-secondary-600 max-w-2xl mx-auto">
-              Simple, secure, and intelligent healthcare guidance in three easy steps
+              {t('home.howItWorks.subtitle')}
             </p>
           </div>
 
@@ -312,10 +310,10 @@ const Home = () => {
                 <span className="text-2xl font-bold text-white">1</span>
               </div>
               <h3 className="text-xl font-semibold text-secondary-900 mb-3">
-                Describe Your Symptoms
+                {t('home.howItWorks.step1.title')}
               </h3>
               <p className="text-secondary-600 leading-relaxed">
-                Tell us about your health concerns in your preferred language - English, Korean, or Uzbek.
+                {t('home.howItWorks.step1.description')}
               </p>
             </div>
 
@@ -325,10 +323,10 @@ const Home = () => {
                 <span className="text-2xl font-bold text-white">2</span>
               </div>
               <h3 className="text-xl font-semibold text-secondary-900 mb-3">
-                AI Analysis
+                {t('home.howItWorks.step2.title')}
               </h3>
               <p className="text-secondary-600 leading-relaxed">
-                Our advanced AI analyzes your symptoms and provides personalized health insights.
+                {t('home.howItWorks.step2.description')}
               </p>
             </div>
 
@@ -338,10 +336,10 @@ const Home = () => {
                 <span className="text-2xl font-bold text-white">3</span>
               </div>
               <h3 className="text-xl font-semibold text-secondary-900 mb-3">
-                Get Recommendations
+                {t('home.howItWorks.step3.title')}
               </h3>
               <p className="text-secondary-600 leading-relaxed">
-                Receive doctor recommendations and guidance on your next steps for better health.
+                {t('home.howItWorks.step3.description')}
               </p>
             </div>
           </div>
@@ -353,16 +351,16 @@ const Home = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-6">
-              Ready to understand your health better?
+              {t('home.ctaSection.ready')}
             </h2>
             <p className="text-xl text-primary-100 mb-8 leading-relaxed">
-              Join thousands of users who trust Avicenna for reliable health guidance. Start your free symptom analysis today.
+              {t('home.ctaSection.joinThousands')}
             </p>
             <Link 
               to="/chat" 
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-primary-700 font-bold text-lg rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 hover:bg-primary-50"
             >
-              Get Started Now
+              {t('home.ctaSection.getStarted')}
               <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

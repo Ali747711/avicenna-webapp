@@ -188,12 +188,12 @@ const Auth = () => {
             <div className="p-6 pt-0">
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-display font-bold text-white mb-2">
-                  {mode === 'signin' ? 'Welcome Back' : 'Join Avicenna'}
+                  {mode === 'signin' ? t('auth.title') : t('auth.joinTitle')}
                 </h1>
                 <p className="text-white/80">
                   {mode === 'signin' 
-                    ? 'Sign in to access your health history' 
-                    : 'Create your account to get started'
+                    ? t('auth.description') 
+                    : t('auth.joinDescription')
                   }
                 </p>
               </div>

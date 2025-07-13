@@ -28,19 +28,66 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'API configuration error' });
     }
 
-    // Simplified Gemini prompt for faster response
-    const prompt = `User symptoms: "${symptoms}"
+    // Advanced Medical AI Prompt with Clinical Reasoning
+    const prompt = `You are Avicenna, an advanced medical AI assistant designed for symptom analysis. You possess comprehensive medical knowledge and follow evidence-based clinical reasoning protocols.
 
-Respond with valid JSON only:
+PATIENT PRESENTATION: "${symptoms}"
+
+CLINICAL ANALYSIS FRAMEWORK:
+1. Perform systematic symptom analysis using differential diagnosis approach
+2. Consider common conditions first, but don't ignore serious possibilities
+3. Assess urgency based on established medical criteria
+4. Provide evidence-based recommendations
+5. Use appropriate medical terminology with clear explanations
+
+RESPONSE REQUIREMENTS:
+- Be thorough but concise
+- Consider patient safety as top priority
+- Include red flag symptoms assessment
+- Provide actionable guidance
+- Explain medical reasoning
+
+Respond with this exact JSON structure:
 {
-  "conditions": [{"name": "Condition Name", "explanation": "Brief explanation"}],
-  "urgency": "monitor_at_home|see_doctor_soon|emergency_care",
-  "doctor_type": "Type of doctor to consult (e.g., General Practitioner, Dermatologist, Cardiologist, etc.)",
-  "recommendations": ["brief advice"],
-  "disclaimer": "This is not a medical diagnosis. Consult healthcare professionals for proper medical advice."
+  "primaryAnalysis": {
+    "presentingSymptoms": ["list of key symptoms identified"],
+    "clinicalImpression": "Professional assessment of symptom pattern"
+  },
+  "differentialDiagnosis": [
+    {
+      "condition": "Condition Name",
+      "likelihood": "high|moderate|low",
+      "explanation": "Clinical reasoning and symptom correlation",
+      "keyFeatures": ["Supporting symptoms/signs"]
+    }
+  ],
+  "urgencyAssessment": {
+    "level": "monitor_at_home|see_doctor_soon|emergency_care",
+    "reasoning": "Clinical justification for urgency level",
+    "redFlags": ["Warning signs to watch for"],
+    "timeframe": "When to seek care (e.g., 'within 24 hours', 'if worsening')"
+  },
+  "recommendations": {
+    "immediate": ["Actions to take now"],
+    "monitoring": ["Signs and symptoms to watch"],
+    "lifestyle": ["Self-care measures"],
+    "followUp": ["When and why to seek medical care"]
+  },
+  "specialistReferral": {
+    "recommended": true/false,
+    "specialty": "Type of specialist if needed",
+    "reasoning": "Why this specialist is recommended"
+  },
+  "educationalContent": {
+    "overview": "Brief explanation of most likely condition",
+    "whatToExpect": "Natural course and expected timeline",
+    "prevention": "How to prevent similar issues"
+  },
+  "disclaimer": "This AI analysis is for informational purposes only and does not replace professional medical diagnosis or treatment. Seek immediate medical attention for severe symptoms or if condition worsens."
 }
 
-Language: ${language === 'ko' ? 'Korean' : language === 'uz' ? 'Uzbek' : 'English'}. Return JSON only.`;
+LANGUAGE: Respond in ${language === 'ko' ? 'Korean (한국어)' : language === 'uz' ? 'Uzbek (O\'zbek tili)' : 'English'}
+CRITICAL: Return only valid JSON. No additional text or formatting.`;
 
     // Create AbortController for timeout
     const controller = new AbortController();
@@ -165,27 +212,82 @@ Language: ${language === 'ko' ? 'Korean' : language === 'uz' ? 'Uzbek' : 'Englis
       if (!parsedResponse) {
         console.log('All JSON parsing attempts failed, using fallback structure');
         parsedResponse = {
-          conditions: [
+          primaryAnalysis: {
+            presentingSymptoms: ["Symptom analysis requested"],
+            clinicalImpression: "AI analysis indicates the need for professional medical evaluation"
+          },
+          differentialDiagnosis: [
             {
-              name: "Analysis Available",
-              explanation: aiResponse
+              condition: "Medical Evaluation Needed",
+              likelihood: "high",
+              explanation: "Based on the symptoms described, professional medical assessment is recommended",
+              keyFeatures: ["Patient-reported symptoms require clinical evaluation"]
             }
           ],
-          urgency: "see_doctor_soon",
-          recommendations: ["Please consult with a healthcare professional for proper diagnosis"],
-          disclaimer: "This is not a medical diagnosis. Consult healthcare professionals for proper medical advice."
+          urgencyAssessment: {
+            level: "see_doctor_soon",
+            reasoning: "Symptoms require professional medical evaluation for proper diagnosis",
+            redFlags: ["Worsening symptoms", "New concerning symptoms"],
+            timeframe: "within 24-48 hours or sooner if symptoms worsen"
+          },
+          recommendations: {
+            immediate: ["Monitor symptoms closely"],
+            monitoring: ["Watch for worsening or new symptoms"],
+            lifestyle: ["Rest and maintain good hydration"],
+            followUp: ["Schedule appointment with healthcare provider"]
+          },
+          specialistReferral: {
+            recommended: false,
+            specialty: "General Practitioner",
+            reasoning: "Start with primary care evaluation"
+          },
+          educationalContent: {
+            overview: "Professional medical evaluation is recommended for proper symptom assessment",
+            whatToExpected: "Healthcare provider will perform thorough evaluation",
+            prevention: "Regular health checkups help identify issues early"
+          },
+          disclaimer: "This AI analysis is for informational purposes only and does not replace professional medical diagnosis or treatment. Seek immediate medical attention for severe symptoms or if condition worsens."
         };
       }
     }
 
     // Validate response structure
-    if (!parsedResponse.conditions || !parsedResponse.urgency || !parsedResponse.disclaimer) {
+    if (!parsedResponse.primaryAnalysis || !parsedResponse.urgencyAssessment || !parsedResponse.disclaimer) {
+      console.log('Response structure validation failed, applying corrections');
       parsedResponse = {
-        conditions: parsedResponse.conditions || [{ name: "General Health Concern", explanation: "Based on your symptoms, it's recommended to consult with a healthcare professional." }],
-        urgency: parsedResponse.urgency || "see_doctor_soon",
-        doctor_type: parsedResponse.doctor_type || "General Practitioner",
-        recommendations: parsedResponse.recommendations || ["Consult with a healthcare professional"],
-        disclaimer: "This is not a medical diagnosis. Consult healthcare professionals for proper medical advice."
+        primaryAnalysis: parsedResponse.primaryAnalysis || {
+          presentingSymptoms: ["Symptoms requiring evaluation"],
+          clinicalImpression: "Medical assessment recommended"
+        },
+        differentialDiagnosis: parsedResponse.differentialDiagnosis || [{
+          condition: "General Health Concern",
+          likelihood: "moderate",
+          explanation: "Based on your symptoms, it's recommended to consult with a healthcare professional",
+          keyFeatures: ["Patient-reported symptoms"]
+        }],
+        urgencyAssessment: parsedResponse.urgencyAssessment || {
+          level: "see_doctor_soon",
+          reasoning: "Symptoms warrant professional medical evaluation",
+          redFlags: ["Worsening symptoms"],
+          timeframe: "within 24-48 hours"
+        },
+        recommendations: parsedResponse.recommendations || {
+          immediate: ["Monitor symptoms"],
+          monitoring: ["Watch for changes"],
+          lifestyle: ["Rest and hydration"],
+          followUp: ["Consult healthcare professional"]
+        },
+        specialistReferral: parsedResponse.specialistReferral || {
+          recommended: false,
+          specialty: "General Practitioner",
+          reasoning: "Primary care evaluation recommended"
+        },
+        educationalContent: parsedResponse.educationalContent || {
+          overview: "Professional medical evaluation recommended",
+          whatToExpected: "Healthcare provider will assess symptoms",
+          prevention: "Regular health monitoring"
+        },
+        disclaimer: "This AI analysis is for informational purposes only and does not replace professional medical diagnosis or treatment. Seek immediate medical attention for severe symptoms or if condition worsens."
       };
     }
 
@@ -215,21 +317,41 @@ Language: ${language === 'ko' ? 'Korean' : language === 'uz' ? 'Uzbek' : 'Englis
         error: 'Service temporarily unavailable',
         message: 'Our AI service is currently experiencing high demand. Please try again in a few moments.',
         fallback: {
-          conditions: [
+          primaryAnalysis: {
+            presentingSymptoms: ["Service temporarily unavailable"],
+            clinicalImpression: "Professional medical evaluation recommended during service interruption"
+          },
+          differentialDiagnosis: [
             {
-              name: "General Health Concern",
-              explanation: "Based on your symptoms, it's recommended to monitor your condition and consult with a healthcare professional if symptoms persist or worsen."
+              condition: "General Health Concern",
+              likelihood: "moderate",
+              explanation: "Based on your symptoms, it's recommended to monitor your condition and consult with a healthcare professional if symptoms persist or worsen",
+              keyFeatures: ["Patient-reported symptoms requiring evaluation"]
             }
           ],
-          urgency: "see_doctor_soon",
-          doctor_type: "General Practitioner",
-          recommendations: [
-            "Monitor your symptoms closely",
-            "Stay hydrated and get plenty of rest",
-            "Consult with a healthcare professional if symptoms worsen or persist",
-            "Seek immediate medical attention if you experience severe symptoms"
-          ],
-          disclaimer: "This is not a medical diagnosis. Consult healthcare professionals for proper medical advice."
+          urgencyAssessment: {
+            level: "see_doctor_soon",
+            reasoning: "Given service limitations, professional evaluation is recommended for proper assessment",
+            redFlags: ["Severe symptoms", "Rapidly worsening condition", "Persistent symptoms"],
+            timeframe: "within 24-48 hours or sooner if symptoms worsen"
+          },
+          recommendations: {
+            immediate: ["Monitor your symptoms closely", "Stay hydrated and get plenty of rest"],
+            monitoring: ["Watch for worsening symptoms", "Note any new symptoms"],
+            lifestyle: ["Adequate rest", "Proper hydration", "Avoid strenuous activity"],
+            followUp: ["Consult with a healthcare professional if symptoms worsen or persist", "Seek immediate medical attention if you experience severe symptoms"]
+          },
+          specialistReferral: {
+            recommended: false,
+            specialty: "General Practitioner",
+            reasoning: "Start with primary care evaluation for initial assessment"
+          },
+          educationalContent: {
+            overview: "Professional medical evaluation is recommended for proper symptom assessment",
+            whatToExpected: "Healthcare provider will perform comprehensive evaluation",
+            prevention: "Regular health monitoring and early medical consultation for concerning symptoms"
+          },
+          disclaimer: "This AI analysis is for informational purposes only and does not replace professional medical diagnosis or treatment. Seek immediate medical attention for severe symptoms or if condition worsens."
         },
         timestamp: new Date().toISOString()
       });

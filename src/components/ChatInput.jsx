@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Send } from 'lucide-react';
 
@@ -6,6 +6,11 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
   const { t, i18n } = useTranslation();
   const [message, setMessage] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState(i18n.language || 'en');
+
+  // Update selected language when global language changes
+  useEffect(() => {
+    setSelectedLanguage(i18n.language || 'en');
+  }, [i18n.language]);
 
   const languages = [
     { code: 'en', name: 'English', flag: '🇺🇸', shortName: 'EN' },
@@ -16,9 +21,15 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim() && !isLoading && !disabled) {
-      onSendMessage(message.trim(), selectedLanguage);
+      onSendMessage(message.trim(), i18n.language);
       setMessage('');
     }
+  };
+
+  // When language changes, update the current input language
+  const handleLanguageChange = (langCode) => {
+    setSelectedLanguage(langCode);
+    i18n.changeLanguage(langCode);
   };
 
   const handleKeyPress = (e) => {
@@ -29,14 +40,7 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
   };
 
   const getPlaceholder = () => {
-    switch (selectedLanguage) {
-      case 'ko':
-        return '증상을 자세히 설명해주세요...';
-      case 'uz':
-        return 'Simptomlaringizni batafsil tasvirlab bering...';
-      default:
-        return 'Describe your symptoms in detail...';
-    }
+    return t('chat.placeholder');
   };
 
   const getExamplePrompts = () => {
@@ -59,11 +63,39 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
     }
   };
 
+  const getSampleSymptoms = () => {
+    return [
+      t('chat.samples.headacheFever'),
+      t('chat.samples.coughSoreThroat'),
+      t('chat.samples.stomachPain'),
+      t('chat.samples.dizzyTired')
+    ];
+  };
+
   return (
     <div className="relative">
+      {/* Sample Symptoms Display - Hidden on Mobile */}
+      {!message.trim() && (
+        <div className="mb-3 md:mb-4 px-2 hidden md:block">
+          <p className="text-xs text-white/30 mb-2">{t('common.tryTheseExamples')}</p>
+          <div className="flex flex-wrap gap-2">
+            {getSampleSymptoms().map((symptom, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setMessage(symptom)}
+                className="px-3 py-1.5 bg-slate-700/40 hover:bg-slate-700/60 text-white/70 hover:text-white/90 text-xs rounded-full transition-colors border border-white/10 hover:border-white/20"
+              >
+                {symptom}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit}>
-        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-4 focus-within:border-primary-500 transition-colors shadow-lg">
-          <div className="flex items-end space-x-4">
+        <div className="focus-within:border-primary-400 transition-colors">
+          <div className="flex items-end space-x-3 md:space-x-4">
             {/* Text Input */}
             <div className="flex-1">
               <textarea
@@ -71,13 +103,13 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder={getPlaceholder()}
-                className="w-full bg-transparent text-white placeholder-slate-400 resize-none focus:outline-none text-base leading-relaxed min-h-[24px] max-h-[200px]"
+                className="w-full bg-transparent text-white placeholder-slate-400 resize-none focus:outline-none text-sm md:text-base leading-relaxed min-h-[32px] max-h-[200px]"
                 disabled={isLoading || disabled}
                 maxLength={1000}
                 rows={1}
                 style={{
                   height: 'auto',
-                  minHeight: '24px'
+                  minHeight: '32px'
                 }}
                 onInput={(e) => {
                   e.target.style.height = 'auto';
@@ -86,21 +118,21 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
               />
               
               {/* Bottom Row: Language + Character Count */}
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-700">
-                <div className="flex items-center space-x-2">
+              <div className="flex items-center justify-between mt-3 md:mt-4 pt-3 md:pt-4 border-t border-white/10">
+                <div className="flex items-center space-x-1 md:space-x-2">
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
                       type="button"
-                      onClick={() => setSelectedLanguage(lang.code)}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                      onClick={() => handleLanguageChange(lang.code)}
+                      className={`px-2 py-1 md:px-4 md:py-2 rounded-full text-xs md:text-sm font-medium transition-colors ${
                         selectedLanguage === lang.code
                           ? 'bg-primary-600 text-white'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                          : 'text-slate-400 hover:text-white hover:bg-white/10'
                       }`}
                     >
                       <span className="mr-1">{lang.flag}</span>
-                      {lang.shortName}
+                      <span className="hidden sm:inline">{lang.shortName}</span>
                     </button>
                   ))}
                 </div>
@@ -112,16 +144,16 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
             <button
               type="submit"
               disabled={!message.trim() || isLoading || disabled}
-              className={`p-3 rounded-xl transition-all duration-200 flex items-center justify-center min-w-[48px] self-end ${
+              className={`p-3 md:p-4 rounded-full transition-all duration-200 flex items-center justify-center min-w-[44px] md:min-w-[52px] self-end ${
                 !message.trim() || isLoading || disabled
                   ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
                   : 'bg-primary-600 text-white hover:bg-primary-700 active:scale-95 shadow-lg'
               }`}
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div className="w-5 h-5 md:w-6 md:h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
               ) : (
-                <Send className="w-5 h-5" />
+                <Send className="w-5 h-5 md:w-6 md:h-6" />
               )}
             </button>
           </div>

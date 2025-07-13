@@ -64,17 +64,15 @@ const About = () => {
               <div className="hidden md:flex items-center space-x-8">
                 <Link 
                   to="/" 
-                  className="nav-link text-white/90 hover:text-white font-medium transition-all duration-300 hover:scale-105 hover:drop-shadow-sm relative group"
+                  className="nav-link text-white/90 hover:text-white font-medium"
                 >
                   {t('nav.home')}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-400 transition-all duration-300 group-hover:w-full"></span>
                 </Link>
                 <Link 
                   to="/about" 
-                  className="nav-link text-white font-medium transition-all duration-300 hover:scale-105 hover:drop-shadow-sm relative group"
+                  className="nav-link active text-white font-medium"
                 >
                   {t('nav.about')}
-                  <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-accent-400 transition-all duration-300"></span>
                 </Link>
                 <div className="nav-item-wrapper">
                   <LanguageSelector />
@@ -82,25 +80,25 @@ const About = () => {
                 {isAuthenticated ? (
                   <div className="flex items-center space-x-4">
                     <div className="text-white/90 text-sm">
-                      Hello, {userProfile?.name || user?.displayName || 'User'}
+                      {t('common.hello')}, {userProfile?.name || user?.displayName || 'User'}
                     </div>
                     <Link 
                       to="/profile" 
-                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium text-sm"
+                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 font-medium text-sm"
                     >
-                      Profile
+                      {t('common.profile')}
                     </Link>
                     <button 
                       onClick={signOut}
-                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium text-sm"
+                      className="nav-button bg-white/10 backdrop-blur-sm text-white border border-white/20 px-4 py-2 rounded-full hover:bg-white/20 hover:border-white/30 font-medium text-sm"
                     >
-                      Sign Out
+                      {t('common.signOut')}
                     </button>
                   </div>
                 ) : (
                   <Link 
                     to="/chat" 
-                    className="nav-button bg-gradient-to-r from-accent-500 to-accent-600 text-white px-6 py-2.5 rounded-full hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium"
+                    className="nav-button bg-gradient-to-r from-accent-500 to-accent-600 text-white px-6 py-2.5 rounded-full font-medium"
                   >
                     Try Avicenna
                   </Link>
@@ -144,14 +142,14 @@ const About = () => {
                   {isAuthenticated ? (
                     <>
                       <div className="px-4 py-2 text-white/90 text-sm">
-                        Hello, {userProfile?.name || user?.displayName || 'User'}
+                        {t('common.hello')}, {userProfile?.name || user?.displayName || 'User'}
                       </div>
                       <Link 
                         to="/profile" 
                         className="bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-3 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium text-center"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Profile
+                        {t('common.profile')}
                       </Link>
                       <button 
                         onClick={() => {
@@ -160,7 +158,7 @@ const About = () => {
                         }}
                         className="bg-white/10 backdrop-blur-sm text-white border border-white/20 px-6 py-3 rounded-full hover:bg-white/20 hover:border-white/30 hover:scale-105 hover:shadow-lg transition-all duration-300 font-medium text-center"
                       >
-                        Sign Out
+                        {t('common.signOut')}
                       </button>
                     </>
                   ) : (
@@ -203,11 +201,10 @@ const About = () => {
           <div className="enhanced-glass-card rounded-3xl p-8 md:p-12 shadow-2xl border border-white/20 mb-12">
             <div className="text-center mb-10">
               <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">
-                Our Mission
+                {t('about.mission.title')}
               </h2>
               <p className="text-lg text-white/80 max-w-3xl mx-auto">
-                Breaking down language barriers in healthcare by providing accessible, AI-powered symptom analysis 
-                for the international community in South Korea.
+                {t('about.mission.description')}
               </p>
             </div>
             
@@ -216,9 +213,9 @@ const About = () => {
                 <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
                   <Globe className="w-8 h-8 text-primary-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Multilingual Care</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">{t('about.values.multilingual.title')}</h3>
                 <p className="text-white/70">
-                  Healthcare guidance in English, Korean, and Uzbek to serve our diverse community.
+                  {t('about.values.multilingual.description')}
                 </p>
               </div>
               
@@ -226,19 +223,19 @@ const About = () => {
                 <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
                   <Brain className="w-8 h-8 text-accent-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">AI-Powered Insights</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">{t('about.values.aiPowered.title')}</h3>
                 <p className="text-white/70">
-                  Advanced artificial intelligence trained on medical knowledge to provide accurate symptom analysis.
+                  {t('about.values.aiPowered.description')}
                 </p>
               </div>
               
               <div className="text-center">
                 <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/20">
-                  <Heart className="w-8 h-8 text-red-400" />
+                  <Users className="w-8 h-8 text-green-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Compassionate Care</h3>
+                <h3 className="text-xl font-semibold text-white mb-2">{t('about.values.accessible.title')}</h3>
                 <p className="text-white/70">
-                  Understanding the unique challenges faced by foreigners navigating healthcare systems.
+                  {t('about.values.accessible.description')}
                 </p>
               </div>
             </div>
@@ -346,32 +343,29 @@ const About = () => {
               <AlertTriangle className="w-8 h-8 text-amber-400 flex-shrink-0 mt-1" />
               <div>
                 <h2 className="text-2xl font-display font-bold text-amber-100 mb-4">
-                  Important Medical Disclaimer
+                  {t('about.disclaimer.title')}
                 </h2>
                 <div className="space-y-4 text-amber-200">
                   <p className="font-medium">
-                    Avicenna is an AI-powered health information tool and is NOT a substitute for professional medical advice, diagnosis, or treatment.
+                    {t('about.disclaimer.substitute')}
                   </p>
                   
                   <div className="space-y-2 text-sm">
-                    <p><strong>Always seek professional medical care when:</strong></p>
+                    <p><strong>{t('about.disclaimer.seekProfessional')}:</strong></p>
                     <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li>You have severe, persistent, or worsening symptoms</li>
-                      <li>You experience emergency symptoms (chest pain, difficulty breathing, severe bleeding, etc.)</li>
-                      <li>You have chronic conditions requiring ongoing medical management</li>
-                      <li>You need medication prescriptions or medical procedures</li>
+                      <li>{t('about.disclaimer.severeSymptoms')}</li>
+                      <li>{t('about.disclaimer.emergencySymptoms')}</li>
+                      <li>{t('about.disclaimer.chronicConditions')}</li>
+                      <li>{t('about.disclaimer.medications')}</li>
                     </ul>
                   </div>
                   
                   <p className="text-sm">
-                    <strong>Limitations:</strong> Our AI provides general health information based on symptom analysis. 
-                    It cannot perform physical examinations, order medical tests, or provide definitive diagnoses. 
-                    Individual medical circumstances vary significantly.
+                    <strong>{t('about.disclaimer.limitations')}:</strong> {t('about.disclaimer.generalInfo')}
                   </p>
                   
                   <p className="text-sm">
-                    <strong>Emergency Situations:</strong> In case of medical emergencies, immediately contact local emergency services 
-                    (119 in South Korea) or visit the nearest emergency room.
+                    <strong>{t('about.disclaimer.emergencySituations')}:</strong> {t('about.disclaimer.emergencyContact')}
                   </p>
                 </div>
               </div>
@@ -389,54 +383,58 @@ const About = () => {
                 <Shield className="w-8 h-8 text-green-400" />
               </div>
               <h2 className="text-3xl font-display font-bold text-white mb-4">
-                Privacy & Security
+                {t('about.privacy.title')}
               </h2>
               <p className="text-lg text-white/80">
-                Your health information is sensitive. We're committed to protecting your privacy and maintaining the highest security standards.
+                {t('about.privacy.description')}
               </p>
             </div>
             
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white">Data Protection</h3>
+                <h3 className="text-xl font-semibold text-white">
+                  {t('about.privacy.dataProtection.title')}
+                </h3>
                 <ul className="space-y-2 text-white/80">
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    No personal health data is permanently stored
+                    {t('about.privacy.dataProtection.noPersonal')}
                   </li>
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    All communications are encrypted in transit
+                    {t('about.privacy.dataProtection.encrypted')}
                   </li>
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    No account registration required for basic use
+                    {t('about.privacy.dataProtection.noAccount')}
                   </li>
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-green-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    Anonymous usage analytics only
+                    {t('about.privacy.dataProtection.anonymous')}
                   </li>
                 </ul>
               </div>
               
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-white">Your Control</h3>
+                <h3 className="text-xl font-semibold text-white">
+                  {t('about.privacy.yourControl.title')}
+                </h3>
                 <ul className="space-y-2 text-white/80">
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    Clear chat history anytime
+                    {t('about.privacy.yourControl.clearHistory')}
                   </li>
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    Choose your preferred language
+                    {t('about.privacy.yourControl.preferredLanguage')}
                   </li>
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    Use without creating an account
+                    {t('about.privacy.yourControl.noAccount')}
                   </li>
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-blue-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    Access transparent AI explanations
+                    {t('about.privacy.yourControl.transparent')}
                   </li>
                 </ul>
               </div>
@@ -450,24 +448,24 @@ const About = () => {
         <div className="container mx-auto max-w-4xl text-center">
           <div className="enhanced-glass-card rounded-3xl p-8 md:p-12 shadow-2xl border border-white/20">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-6">
-              Ready to get started?
+              {t('about.cta.ready')}
             </h2>
             <p className="text-lg text-white/80 mb-8 max-w-2xl mx-auto">
-              Experience personalized health guidance in your preferred language. 
-              Start your symptom analysis with Avicenna today.
+              {t('about.cta.personalized')} 
+              {t('about.cta.symptomAnalysis')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link 
                 to="/chat" 
                 className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-accent-500 to-accent-600 text-white font-bold text-lg rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300"
               >
-                Start Symptom Analysis
+                {t('about.cta.startSymptomAnalysis')}
                 <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>
               <span className="text-white/60 text-sm">
-                Free • No registration required • Available in 3 languages
+                {t('about.cta.free')} • {t('about.cta.noRegistration')} • {t('about.cta.languages')}
               </span>
             </div>
           </div>
