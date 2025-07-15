@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { User, AlertTriangle, Clock, Zap } from 'lucide-react';
 import { getUrgencyStyle, getUrgencyText } from '../utils/api';
 import SunIcon from './SunIcon';
+import HealthcareProviders from './HealthcareProviders';
 
 const ChatMessage = ({ message, isUser, isLoading = false }) => {
   const { t, i18n } = useTranslation();
@@ -276,6 +277,17 @@ const ChatMessage = ({ message, isUser, isLoading = false }) => {
           </div>
         )}
 
+        {/* Healthcare Providers Recommendations */}
+        {response && (
+          <div className="mb-4 md:mb-6">
+            <HealthcareProviders 
+              symptoms={message.content || ''}
+              conditions={response.differentialDiagnosis?.map(d => d.condition) || []}
+              urgency={response.urgencyAssessment?.level || response.urgency || 'see_doctor_soon'}
+            />
+          </div>
+        )}
+
         {/* Backward Compatibility - Old Format */}
         {!response?.primaryAnalysis && response?.conditions && response.conditions.length > 0 && (
           <div className="mb-4 md:mb-6">
@@ -317,6 +329,11 @@ const ChatMessage = ({ message, isUser, isLoading = false }) => {
               ))}
             </ul>
           </div>
+        )}
+
+        {/* Healthcare Providers */}
+        {response?.healthcareProviders && response.healthcareProviders.length > 0 && (
+          <HealthcareProviders providers={response.healthcareProviders} />
         )}
 
         {/* Disclaimer */}

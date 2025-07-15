@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/FirebaseAuthContext';
+import SessionWarning from './components/SessionWarning';
+import SessionTimeoutNotification from './components/SessionTimeoutNotification';
 import './styles/App.css';
 
 // Import pages
@@ -15,6 +17,8 @@ function App() {
     <AuthProvider>
       <Router>
         <div className="App">
+          <SessionWarning />
+          <SessionTimeoutNotification />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/chat" element={<Chat />} />

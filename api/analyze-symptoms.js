@@ -76,7 +76,9 @@ Respond with this exact JSON structure:
   "specialistReferral": {
     "recommended": true/false,
     "specialty": "Type of specialist if needed",
-    "reasoning": "Why this specialist is recommended"
+    "reasoning": "Why this specialist is recommended",
+    "specificConditions": ["Specific conditions this specialist treats"],
+    "whenToSee": "When to schedule appointment (e.g., 'within 1 week', 'as soon as possible')"
   },
   "educationalContent": {
     "overview": "Brief explanation of most likely condition",
@@ -239,7 +241,9 @@ CRITICAL: Return only valid JSON. No additional text or formatting.`;
           specialistReferral: {
             recommended: false,
             specialty: "General Practitioner",
-            reasoning: "Start with primary care evaluation"
+            reasoning: "Start with primary care evaluation",
+            specificConditions: ["General health concerns"],
+            whenToSee: "within 1 week"
           },
           educationalContent: {
             overview: "Professional medical evaluation is recommended for proper symptom assessment",
@@ -280,7 +284,9 @@ CRITICAL: Return only valid JSON. No additional text or formatting.`;
         specialistReferral: parsedResponse.specialistReferral || {
           recommended: false,
           specialty: "General Practitioner",
-          reasoning: "Primary care evaluation recommended"
+          reasoning: "Primary care evaluation recommended",
+          specificConditions: ["General health concerns"],
+          whenToSee: "within 1 week"
         },
         educationalContent: parsedResponse.educationalContent || {
           overview: "Professional medical evaluation recommended",
@@ -344,7 +350,9 @@ CRITICAL: Return only valid JSON. No additional text or formatting.`;
           specialistReferral: {
             recommended: false,
             specialty: "General Practitioner",
-            reasoning: "Start with primary care evaluation for initial assessment"
+            reasoning: "Start with primary care evaluation for initial assessment",
+            specificConditions: ["General health concerns"],
+            whenToSee: "within 1 week"
           },
           educationalContent: {
             overview: "Professional medical evaluation is recommended for proper symptom assessment",

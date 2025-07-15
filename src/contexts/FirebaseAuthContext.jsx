@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -38,12 +38,116 @@ export const useAuth = () => {
   return context;
 };
 
+// Session timeout configuration (in milliseconds)
+const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+const WARNING_TIME = 5 * 60 * 1000; // 5 minutes before timeout
+
 // Auth Provider Component
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sessionWarning, setSessionWarning] = useState(false);
+  const [sessionTimeout, setSessionTimeout] = useState(false);
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  
+  // Refs for timers
+  const sessionTimerRef = useRef(null);
+  const warningTimerRef = useRef(null);
+
+  // Track user activity
+  const updateActivity = () => {
+    setLastActivity(Date.now());
+    if (sessionWarning) {
+      setSessionWarning(false);
+    }
+  };
+
+  // Set up activity listeners
+  useEffect(() => {
+    if (!user) return;
+
+    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    const handleActivity = () => {
+      updateActivity();
+    };
+
+    activityEvents.forEach(event => {
+      document.addEventListener(event, handleActivity, true);
+    });
+
+    return () => {
+      activityEvents.forEach(event => {
+        document.removeEventListener(event, handleActivity, true);
+      });
+    };
+  }, [user]);
+
+  // Session timeout management
+  useEffect(() => {
+    if (!user) {
+      // Clear timers when user logs out
+      if (sessionTimerRef.current) {
+        clearTimeout(sessionTimerRef.current);
+        sessionTimerRef.current = null;
+      }
+      if (warningTimerRef.current) {
+        clearTimeout(warningTimerRef.current);
+        warningTimerRef.current = null;
+      }
+      setSessionWarning(false);
+      return;
+    }
+
+    // Clear existing timers
+    if (sessionTimerRef.current) {
+      clearTimeout(sessionTimerRef.current);
+    }
+    if (warningTimerRef.current) {
+      clearTimeout(warningTimerRef.current);
+    }
+
+    // Set warning timer
+    warningTimerRef.current = setTimeout(() => {
+      setSessionWarning(true);
+    }, SESSION_TIMEOUT - WARNING_TIME);
+
+    // Set session timeout timer
+    sessionTimerRef.current = setTimeout(() => {
+      handleSessionTimeout();
+    }, SESSION_TIMEOUT);
+
+    return () => {
+      if (sessionTimerRef.current) {
+        clearTimeout(sessionTimerRef.current);
+      }
+      if (warningTimerRef.current) {
+        clearTimeout(warningTimerRef.current);
+      }
+    };
+  }, [user, lastActivity]);
+
+  // Handle session timeout
+  const handleSessionTimeout = async () => {
+    console.log('Session timeout - logging out user');
+    try {
+      await signOut(auth);
+      setUser(null);
+      setUserProfile(null);
+      setSessionWarning(false);
+      setSessionTimeout(true);
+      setError('Your session has expired due to inactivity. Please sign in again to continue.');
+    } catch (err) {
+      console.error('Error during session timeout logout:', err);
+    }
+  };
+
+  // Extend session manually
+  const extendSession = () => {
+    updateActivity();
+  };
 
   // Listen for authentication state changes
   useEffect(() => {
@@ -52,6 +156,8 @@ export const AuthProvider = ({ children }) => {
       
       if (firebaseUser) {
         setUser(firebaseUser);
+        setLastActivity(Date.now()); // Reset activity timer on login
+        setSessionTimeout(false); // Clear session timeout state
         
         // Get user profile from Firestore
         try {
@@ -84,6 +190,7 @@ export const AuthProvider = ({ children }) => {
       } else {
         setUser(null);
         setUserProfile(null);
+        setSessionWarning(false);
       }
       
       setIsLoading(false);
@@ -419,7 +526,13 @@ export const AuthProvider = ({ children }) => {
     deleteMedicalEntry, // Add new function to context
     getToken,
     isAuthenticated: !!user,
-    clearError: () => setError(null)
+    clearError: () => {
+      setError(null);
+      setSessionTimeout(false);
+    },
+    sessionWarning,
+    sessionTimeout,
+    extendSession
   };
 
   return (
