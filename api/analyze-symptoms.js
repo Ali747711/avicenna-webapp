@@ -421,6 +421,13 @@ CRITICAL INSTRUCTIONS:
       };
     }
 
+    // Ensure followUp is always an array to prevent frontend errors
+    if (parsedResponse.recommendations && parsedResponse.recommendations.followUp) {
+      if (typeof parsedResponse.recommendations.followUp === 'string') {
+        parsedResponse.recommendations.followUp = [parsedResponse.recommendations.followUp];
+      }
+    }
+
     return res.status(200).json({
       success: true,
       data: parsedResponse,
