@@ -18,6 +18,8 @@ export default async function handler(req, res) {
   try {
     const { symptoms, language = 'en' } = req.body;
 
+    console.log('Received request:', { symptoms, language });
+
     if (!symptoms || symptoms.trim().length === 0) {
       return res.status(400).json({ error: 'Symptoms are required' });
     }
@@ -28,8 +30,35 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'API configuration error' });
     }
 
+    // Get language-specific instructions
+    const getLanguageInstructions = (lang) => {
+      switch(lang) {
+        case 'ko':
+          return {
+            intro: "당신은 증상 분석을 위해 설계된 고급 의료 AI 어시스턴트인 아비센나입니다. 포괄적인 의학 지식을 보유하고 있으며 증거 기반 임상 추론 프로토콜을 따릅니다.",
+            languageNote: "중요: 환자가 한국어로 증상을 설명했습니다. 한국어 입력을 이해하고 모든 응답을 한국어로 제공해야 합니다. 한국어를 이해할 수 없더라도 한국어로 응답하세요."
+          };
+        case 'uz':
+          return {
+            intro: "Siz simptomlarni tahlil qilish uchun mo'ljallangan ilg'or tibbiy AI yordamchisi Avicennasiz. Keng qamrovli tibbiy bilimga egasiz va dalillarga asoslangan klinik mulohaza protokollariga amal qilasiz.",
+            languageNote: "Muhim: Bemor o'zbek tilida simptomlarini tasvirlagan. O'zbek tilini tushunishingiz va barcha javoblarni o'zbek tilida berishingiz kerak. O'zbek tilini tushunmasangiz ham, o'zbek tilida javob bering."
+          };
+        default:
+          return {
+            intro: "You are Avicenna, an advanced medical AI assistant designed for symptom analysis. You possess comprehensive medical knowledge and follow evidence-based clinical reasoning protocols.",
+            languageNote: "Important: The patient has described symptoms in English. Provide all responses in English."
+          };
+      }
+    };
+
+    const langInstructions = getLanguageInstructions(language);
+
+    console.log('Language instructions:', langInstructions);
+
     // Advanced Medical AI Prompt with Clinical Reasoning
-    const prompt = `You are Avicenna, an advanced medical AI assistant designed for symptom analysis. You possess comprehensive medical knowledge and follow evidence-based clinical reasoning protocols.
+    const prompt = `${langInstructions.intro}
+
+${langInstructions.languageNote}
 
 PATIENT PRESENTATION: "${symptoms}"
 
@@ -88,8 +117,10 @@ Respond with this exact JSON structure:
   "disclaimer": "This AI analysis is for informational purposes only and does not replace professional medical diagnosis or treatment. Seek immediate medical attention for severe symptoms or if condition worsens."
 }
 
-LANGUAGE: Respond in ${language === 'ko' ? 'Korean (한국어)' : language === 'uz' ? 'Uzbek (O\'zbek tili)' : 'English'}
-CRITICAL: Return only valid JSON. No additional text or formatting.`;
+CRITICAL INSTRUCTIONS:
+- Return only valid JSON. No additional text or formatting.
+- ALL text in the JSON response MUST be in the same language as specified above.
+- If you cannot understand the symptoms, still respond in the correct language.`;
 
     // Create AbortController for timeout
     const controller = new AbortController();
@@ -127,7 +158,7 @@ CRITICAL: Return only valid JSON. No additional text or formatting.`;
               temperature: 0.3,
               topK: 40,
               topP: 0.95,
-              maxOutputTokens: 1000,
+              maxOutputTokens: 2000,
             }
           }),
           signal: controller.signal
@@ -170,6 +201,7 @@ CRITICAL: Return only valid JSON. No additional text or formatting.`;
     console.log('Gemini API data:', JSON.stringify(data, null, 2));
     
     const aiResponse = data.candidates[0]?.content?.parts[0]?.text;
+    console.log('AI Response text:', aiResponse);
 
     if (!aiResponse) {
       throw new Error('No response from Gemini');
@@ -188,7 +220,30 @@ CRITICAL: Return only valid JSON. No additional text or formatting.`;
       if (jsonMatch && jsonMatch[1]) {
         try {
           console.log('Found JSON in markdown, parsing...');
-          parsedResponse = JSON.parse(jsonMatch[1].trim());
+          let jsonText = jsonMatch[1].trim();
+          
+          // Try to fix incomplete JSON by adding missing closing braces
+          if (!jsonText.endsWith('}')) {
+            console.log('JSON appears incomplete, attempting to fix...');
+            const openBraces = (jsonText.match(/\{/g) || []).length;
+            const closeBraces = (jsonText.match(/\}/g) || []).length;
+            const missingBraces = openBraces - closeBraces;
+            
+            // Add missing closing quotes and braces
+            if (jsonText.endsWith('"')) {
+              // Already ends with quote, just add braces
+            } else if (jsonText.match(/[^"}]$/)) {
+              // Doesn't end with quote or brace, add quote first
+              jsonText += '"';
+            }
+            
+            // Add missing closing braces
+            for (let i = 0; i < missingBraces; i++) {
+              jsonText += '}';
+            }
+          }
+          
+          parsedResponse = JSON.parse(jsonText);
         } catch (extractError) {
           console.log('Failed to parse extracted JSON:', extractError);
           parsedResponse = null;
@@ -213,44 +268,113 @@ CRITICAL: Return only valid JSON. No additional text or formatting.`;
       // If all parsing attempts fail, create a structured response
       if (!parsedResponse) {
         console.log('All JSON parsing attempts failed, using fallback structure');
+        
+        const fallbackMessages = {
+          en: {
+            impression: "AI analysis indicates the need for professional medical evaluation",
+            condition: "Medical Evaluation Needed",
+            explanation: "Based on the symptoms described, professional medical assessment is recommended",
+            features: ["Patient-reported symptoms require clinical evaluation"],
+            urgencyReason: "Symptoms require professional medical evaluation for proper diagnosis",
+            redFlags: ["Worsening symptoms", "New concerning symptoms"],
+            timeframe: "within 24-48 hours or sooner if symptoms worsen",
+            immediate: ["Monitor symptoms closely"],
+            monitoring: ["Watch for worsening or new symptoms"],
+            lifestyle: ["Rest and maintain good hydration"],
+            followUp: ["Schedule appointment with healthcare provider"],
+            specialty: "General Practitioner",
+            specialtyReason: "Start with primary care evaluation",
+            specialtyConditions: ["General health concerns"],
+            whenToSeeSpecialist: "within 1 week",
+            eduOverview: "Professional medical evaluation is recommended for proper symptom assessment",
+            eduExpect: "Healthcare provider will perform thorough evaluation",
+            eduPrevention: "Follow medical advice for prevention",
+            disclaimer: "This AI analysis is for informational purposes only and does not replace professional medical diagnosis or treatment. Seek immediate medical attention for severe symptoms or if condition worsens."
+          },
+          ko: {
+            impression: "AI 분석 결과 전문적인 의학적 평가가 필요함을 시사합니다",
+            condition: "의학적 평가 필요",
+            explanation: "제시된 증상을 바탕으로 전문적인 의학적 평가가 권장됩니다",
+            features: ["환자가 보고한 증상은 임상적 평가가 필요합니다"],
+            urgencyReason: "정확한 진단을 위해 증상에 대한 전문적인 의학적 평가가 필요합니다",
+            redFlags: ["증상 악화", "새로운 우려되는 증상"],
+            timeframe: "24-48시간 이내 또는 증상이 악화될 경우 더 빨리",
+            immediate: ["증상을 면밀히 관찰하십시오"],
+            monitoring: ["증상 악화 또는 새로운 증상에 주의하십시오"],
+            lifestyle: ["충분한 휴식과 수분 섭취를 유지하십시오"],
+            followUp: ["의료 서비스 제공자와 진료 예약을 하십시오"],
+            specialty: "일반의",
+            specialtyReason: "1차 진료 평가부터 시작하십시오",
+            specialtyConditions: ["일반 건강 문제"],
+            whenToSeeSpecialist: "1주일 이내",
+            eduOverview: "정확한 증상 평가를 위해 전문적인 의학적 평가가 권장됩니다",
+            eduExpect: "의료 서비스 제공자가 철저한 평가를 수행할 것입니다",
+            eduPrevention: "예방을 위해 의학적 조언을 따르십시오",
+            disclaimer: "이 AI 분석은 정보 제공 목적으로만 제공되며 전문적인 의학적 진단이나 치료를 대체하지 않습니다. 심각한 증상이 있거나 상태가 악화될 경우 즉시 의료 지원을 받으십시오."
+          },
+          uz: {
+            impression: "AI tahlili professional tibbiy baholash zarurligini ko'rsatadi",
+            condition: "Tibbiy baholash talab etiladi",
+            explanation: "Taqdim etilgan alomatlarga asoslanib, professional tibbiy baholash tavsiya etiladi",
+            features: ["Bemor tomonidan bildirilgan alomatlar klinik baholashni talab qiladi"],
+            urgencyReason: "To'g'ri tashxis qo'yish uchun alomatlar professional tibbiy baholashni talab qiladi",
+            redFlags: ["Alomatlarning yomonlashishi", "Yangi tashvishli alomatlar"],
+            timeframe: "24-48 soat ichida yoki alomatlar yomonlashsa, undan ham ertaroq",
+            immediate: ["Alomatlarni diqqat bilan kuzatib boring"],
+            monitoring: ["Alomatlarning yomonlashishi yoki yangi alomatlarga e'tibor bering"],
+            lifestyle: ["Dam oling va yetarli suyuqlik iching"],
+            followUp: ["Tibbiy yordam ko'rsatuvchi bilan uchrashuv belgilang"],
+            specialty: "Umumiy amaliyot shifokori",
+            specialtyReason: "Birlamchi tibbiy yordam baholashidan boshlang",
+            specialtyConditions: ["Umumiy sog'liq muammolari"],
+            whenToSeeSpecialist: "1 hafta ichida",
+            eduOverview: "To'g'ri alomatlarni baholash uchun professional tibbiy ko'rikdan o'tish tavsiya etiladi",
+            eduExpect: "Tibbiy yordam ko'rsatuvchi provayder to'liq baholashni amalga oshiradi",
+            eduPrevention: "Oldini olish uchun tibbiy maslahatlarga rioya qiling",
+            disclaimer: "Ushbu AI tahlili faqat ma'lumot berish uchun mo'ljallangan va professional tibbiy diagnostika yoki davolanishni o'rnini bosmaydi. Qattiq alomatlar yoki ahvol yomonlashgan taqdirda darhol tibbiy yordamga murojaat qiling."
+          }
+        };
+
+        const fb = fallbackMessages[language] || fallbackMessages.en;
+        
         parsedResponse = {
           primaryAnalysis: {
             presentingSymptoms: ["Symptom analysis requested"],
-            clinicalImpression: "AI analysis indicates the need for professional medical evaluation"
+            clinicalImpression: fb.impression
           },
           differentialDiagnosis: [
             {
-              condition: "Medical Evaluation Needed",
+              condition: fb.condition,
               likelihood: "high",
-              explanation: "Based on the symptoms described, professional medical assessment is recommended",
-              keyFeatures: ["Patient-reported symptoms require clinical evaluation"]
+              explanation: fb.explanation,
+              keyFeatures: fb.features
             }
           ],
           urgencyAssessment: {
             level: "see_doctor_soon",
-            reasoning: "Symptoms require professional medical evaluation for proper diagnosis",
-            redFlags: ["Worsening symptoms", "New concerning symptoms"],
-            timeframe: "within 24-48 hours or sooner if symptoms worsen"
+            reasoning: fb.urgencyReason,
+            redFlags: fb.redFlags,
+            timeframe: fb.timeframe
           },
           recommendations: {
-            immediate: ["Monitor symptoms closely"],
-            monitoring: ["Watch for worsening or new symptoms"],
-            lifestyle: ["Rest and maintain good hydration"],
-            followUp: ["Schedule appointment with healthcare provider"]
+            immediate: [fb.immediate],
+            monitoring: [fb.monitoring],
+            lifestyle: [fb.lifestyle],
+            followUp: [fb.followUp]
           },
           specialistReferral: {
             recommended: false,
-            specialty: "General Practitioner",
-            reasoning: "Start with primary care evaluation",
-            specificConditions: ["General health concerns"],
-            whenToSee: "within 1 week"
+            specialty: fb.specialty,
+            reasoning: fb.specialtyReason,
+            specificConditions: fb.specialtyConditions,
+            whenToSee: fb.whenToSeeSpecialist
           },
           educationalContent: {
-            overview: "Professional medical evaluation is recommended for proper symptom assessment",
-            whatToExpected: "Healthcare provider will perform thorough evaluation",
-            prevention: "Regular health checkups help identify issues early"
+            overview: fb.eduOverview,
+            whatToExpect: fb.eduExpect,
+            prevention: fb.eduPrevention
           },
-          disclaimer: "This AI analysis is for informational purposes only and does not replace professional medical diagnosis or treatment. Seek immediate medical attention for severe symptoms or if condition worsens."
+          disclaimer: fb.disclaimer
         };
       }
     }

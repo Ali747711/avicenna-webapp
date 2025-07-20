@@ -21,7 +21,7 @@ const ChatInput = ({ onSendMessage, isLoading, disabled }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim() && !isLoading && !disabled) {
-      onSendMessage(message.trim(), i18n.language);
+      onSendMessage(message.trim(), selectedLanguage);
       setMessage('');
     }
   };
