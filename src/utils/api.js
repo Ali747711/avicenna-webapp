@@ -5,6 +5,10 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
 
 export const analyzeSymptoms = async (symptoms, language = 'en') => {
   try {
+    // Create AbortController for frontend timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    
     const response = await fetch(`${API_BASE_URL}/analyze-symptoms`, {
       method: 'POST',
       headers: {
@@ -14,7 +18,10 @@ export const analyzeSymptoms = async (symptoms, language = 'en') => {
         symptoms,
         language,
       }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
@@ -38,6 +45,12 @@ export const analyzeSymptoms = async (symptoms, language = 'en') => {
     return data.data;
   } catch (error) {
     console.error('Error analyzing symptoms:', error);
+    
+    // Handle timeout errors with user-friendly message
+    if (error.name === 'AbortError') {
+      throw new Error('The request took too long. This can happen with complex symptom descriptions. Please try again or rephrase your symptoms more clearly.');
+    }
+    
     throw error;
   }
 };

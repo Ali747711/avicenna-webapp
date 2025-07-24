@@ -68,6 +68,10 @@ CLINICAL ANALYSIS FRAMEWORK:
 3. Assess urgency based on established medical criteria
 4. Provide evidence-based recommendations
 5. Use appropriate medical terminology with clear explanations
+6. IMPORTANT: Understand informal/colloquial language and translate to medical terms:
+   - "fell on my butt" = coccyx/tailbone trauma, potential bruising or fracture
+   - "walk funny" = altered gait pattern, possible musculoskeletal injury
+   - "sore red foot" = foot pain with inflammation/erythema, possible infection or injury
 
 RESPONSE REQUIREMENTS:
 - Be thorough but concise
@@ -124,7 +128,7 @@ CRITICAL INSTRUCTIONS:
 
     // Create AbortController for timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
 
     // Try different free Gemini models in order of preference
     const models = [
@@ -442,7 +446,7 @@ CRITICAL INSTRUCTIONS:
       return res.status(504).json({
         success: false,
         error: 'Request timeout',
-        message: 'The AI analysis took too long to complete. Please try again.',
+        message: 'The AI analysis took longer than expected. This sometimes happens with complex or informal symptom descriptions. Please try rephrasing your symptoms more clearly (e.g., "tailbone pain after falling" instead of "fell on my butt") or try again.',
         timestamp: new Date().toISOString()
       });
     }
