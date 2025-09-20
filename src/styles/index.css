@@ -33,9 +33,9 @@
       -moz-user-select: text;
       -ms-user-select: text;
       user-select: text;
-    }
-    
-    body {
+}
+
+body {
       font-size: 14px;
       line-height: 1.5;
       overflow-x: hidden;
